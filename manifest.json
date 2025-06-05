@@ -1,0 +1,15 @@
+{
+  "name": "AUI Compass",
+  "id": "TEMP_ID_REPLACE_LATER",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma"],
+  "permissions": ["currentuser"],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://api.figma.com"
+    ]
+  },
+  "documentAccess": "dynamic-page"
+} 

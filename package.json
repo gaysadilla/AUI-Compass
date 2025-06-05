@@ -1,0 +1,58 @@
+{
+  "name": "aui-compass",
+  "version": "1.0.0",
+  "description": "Figma plugin for migrating deprecated design system components",
+  "main": "dist/code.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "watch": "webpack --mode=development --watch",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "get-team-id": "ts-node src/scripts/getTeamId.ts",
+    "get-library-files": "ts-node src/scripts/getLibraryFiles.ts",
+    "get-component-details": "ts-node src/scripts/getComponentDetails.ts"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.9.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.82.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "css-loader": "^6.8.1",
+    "eslint": "^8.0.0",
+    "html-inline-script-webpack-plugin": "^3.2.1",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^29.7.0",
+    "style-loader": "^3.3.3",
+    "ts-jest": "^29.3.4",
+    "ts-loader": "^9.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}
