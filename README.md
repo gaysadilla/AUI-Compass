@@ -224,6 +224,10 @@ npm run get-component-details
 npm test
 ```
 
+## Troubleshooting
+
+- If you encounter a TypeScript error in a script you are not using (such as `getTeamId.ts`), you may comment out or remove the problematic code to unblock the build. This is especially useful if the error is unrelated to your current work (e.g., UI development).
+
 ## Next Implementation Steps
 
 ### 1. Integrate Registry Service
