@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Last Updated**: June 5, 2024
-**Current Phase**: Foundation Complete, Starting Component Discovery
-**Next Task**: Implement deprecated component detection using REST API data
+**Last Updated**: March 19, 2024
+**Current Phase**: Component Registry Implementation
+**Next Task**: Integrate registry service with component detection
 
 ## Project Overview
 
@@ -23,12 +23,14 @@ Internal Figma plugin for migrating deprecated AUI design system components to n
 - [x]  Environment configuration (.env + config.ts)
 - [x]  Utility scripts for API testing
 - [x]  Troubleshooting documentation
+- [x]  Component registry service implementation
+- [x]  Registry data structure and types
 
 ### 🚧 In Progress
 
-- [ ]  Component registry integration from REST API
-- [ ]  Deprecated component detection in current file
+- [ ]  Registry service integration with component detection
 - [ ]  UI to display found components
+- [ ]  Component mapping validation system
 
 ### 📋 TODO
 
@@ -54,11 +56,19 @@ REST API (scripts) → Component Registry → Plugin → UI
     - Handles all REST API calls
     - Methods: getTeamComponents, getComponentSets, getFileDetails
     - Uses PAT for authentication
-2. **Plugin Core** (`src/code.ts`)
+
+2. **Registry Service** (`src/services/registryService.ts`)
+    - Manages component metadata and mappings
+    - Handles registry persistence
+    - Provides methods for component and mapping management
+    - Tracks validation status of mappings
+
+3. **Plugin Core** (`src/code.ts`)
     - Runs in Figma environment
     - Handles UI communication
     - Will implement component search
-3. **UI Layer** (`src/ui.tsx` + components)
+
+4. **UI Layer** (`src/ui.tsx` + components)
     - React-based interface
     - Currently shows initialization state
     - Ready for component list implementation
@@ -125,9 +135,15 @@ figma.ui.postMessage({
 
 ```typescript
 // In code.ts
+import { RegistryService } from './services/registryService';
+
+const registry = new RegistryService();
+await registry.initialize();
+
 async function findDeprecatedComponents(scope: SearchScope) {
   const instances: InstanceNode[] = [];
-
+  const deprecatedComponents = await registry.getDeprecatedComponents();
+  
   // Get nodes based on scope
   let nodesToSearch: SceneNode[] = [];
   switch (scope) {
@@ -150,8 +166,8 @@ async function findDeprecatedComponents(scope: SearchScope) {
   function traverse(node: SceneNode) {
     if (node.type === 'INSTANCE' && node.mainComponent) {
       const componentKey = node.mainComponent.key;
-      // Check if deprecated (need registry data)
-      if (isDeprecated(componentKey)) {
+      const isDeprecated = deprecatedComponents.some(c => c.id === componentKey);
+      if (isDeprecated) {
         instances.push(node);
       }
     }
@@ -209,41 +225,67 @@ npm test
 
 ## Next Implementation Steps
 
-### 1. Create Component Registry
+### 1. Integrate Registry Service
 
 ```typescript
-// src/data/componentRegistry.ts
-interface ComponentRegistry {
-  deprecated: Map<string, DeprecatedComponent>;
-  replacements: Map<string, ReplacementOption[]>;
-}
+// In code.ts
+import { RegistryService } from './services/registryService';
 
-// Load from REST API data or hardcode for testing
-export const registry: ComponentRegistry = {
-  deprecated: new Map([
-    ['component-key-here', {
-      key: 'component-key-here',
-      name: 'Old Button',
-      deprecatedDate: '2024-01-01',
-      replacements: [...]
-    }]
-  ])
-};
+const registry = new RegistryService();
+await registry.initialize();
+
+// Use in component detection
+async function findDeprecatedComponents(scope: SearchScope) {
+  const instances: InstanceNode[] = [];
+  const deprecatedComponents = await registry.getDeprecatedComponents();
+  
+  // Get nodes based on scope
+  let nodesToSearch: SceneNode[] = [];
+  switch (scope) {
+    case 'selection':
+      nodesToSearch = figma.currentPage.selection;
+      break;
+    case 'page':
+      nodesToSearch = figma.currentPage.children;
+      break;
+    case 'file':
+      // Requires loading all pages
+      for (const page of figma.root.children) {
+        await page.loadAsync();
+        nodesToSearch.push(...page.children);
+      }
+      break;
+  }
+
+  // Find instances of deprecated components
+  function traverse(node: SceneNode) {
+    if (node.type === 'INSTANCE' && node.mainComponent) {
+      const componentKey = node.mainComponent.key;
+      const isDeprecated = deprecatedComponents.some(c => c.id === componentKey);
+      if (isDeprecated) {
+        instances.push(node);
+      }
+    }
+    if ('children' in node) {
+      node.children.forEach(traverse);
+    }
+  }
+
+  nodesToSearch.forEach(traverse);
+  return instances;
+}
 ```
 
-### 2. Implement Search in code.ts
+### 2. Implement Mapping Validation
 
 ```typescript
-case MESSAGE_TYPES.SEARCH:
-  const { scope } = msg.data;
-  const instances = await findDeprecatedComponents(scope);
-  const grouped = groupByComponent(instances);
-
-  figma.ui.postMessage({
-    type: MESSAGE_TYPES.SEARCH_COMPLETE,
-    data: { components: grouped }
-  });
-  break;
+// In registryService.ts
+async function validateMapping(mapping: ComponentMapping): Promise<boolean> {
+  // Implement validation logic
+  // Check property compatibility
+  // Verify component structure
+  return true;
+}
 ```
 
 ### 3. Update UI to Show Results
