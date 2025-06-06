@@ -73,6 +73,11 @@ class FigmaApiService {
   async getComponentDetails(key: string): Promise<FigmaApiResponse> {
     return this.makeRequest(`/components/${key}`);
   }
+
+  // Generic GET request
+  async get(endpoint: string): Promise<FigmaApiResponse> {
+    return this.makeRequest(endpoint);
+  }
 }
 
 export const figmaApi = new FigmaApiService(); 
