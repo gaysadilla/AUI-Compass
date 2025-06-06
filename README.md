@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Last Updated**: March 19, 2024
+**Last Updated**: June 6, 2025
 **Current Phase**: Component Registry Implementation
 **Next Task**: Integrate registry service with component detection
 
@@ -25,6 +25,7 @@ Internal Figma plugin for migrating deprecated AUI design system components to n
 - [x]  Troubleshooting documentation
 - [x]  Component registry service implementation
 - [x]  Registry data structure and types
+- [x]  **Button-to-Action Mapping Config implemented in TypeScript**
 
 ### 🚧 In Progress
 
@@ -361,6 +362,20 @@ When adding new features:
 3. Update UI components
 4. Document pattern here
 5. Run build and test
+
+## Mapping Configuration (Button → Action)
+
+A comprehensive mapping configuration for migrating deprecated Button components to the new Action component is now implemented in TypeScript.
+
+- **Location:** `tools/component-discovery/mapping-config/button-to-action-mapping.ts`
+- **Purpose:** Provides type-safe, automated mapping of all Button properties and variants to their Action equivalents, including:
+  - Variant, Size, State, Icon, Color, Label, and Icon Instance
+  - Handles all 432 possible Button configurations
+  - Warns for unmapped color values (theming)
+  - Includes test cases for validation
+- **Integration:** Ready to be imported into migration scripts or Figma plugin code for automated property mapping and migration.
+
+See the mapping config file for details and usage examples.
 
 ---
 
