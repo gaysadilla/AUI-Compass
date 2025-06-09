@@ -1,3 +1,4 @@
+"use strict";
 // import { figmaApi } from '../services/figmaApi';
 // 
 // async function getTeamId() {

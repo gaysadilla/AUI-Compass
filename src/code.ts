@@ -3,8 +3,10 @@
 // This file runs in the Figma environment
 import { UI_WIDTH, UI_HEIGHT, MESSAGE_TYPES } from './utils/constants';
 import { UIMessage } from './types';
+import { registryData } from './data/registryData';
+import { DeprecatedComponent, ComponentInstance, SearchScope } from './types';
 
-console.log('Plugin code starting...');
+console.log('AUI Compass: BACKEND LOADED');
 
 // Show the UI
 figma.showUI(__html__, {
@@ -34,11 +36,50 @@ figma.ui.onmessage = async (msg: UIMessage) => {
         break;
 
       case MESSAGE_TYPES.SEARCH:
+        console.log('AUI Compass: BACKEND SEARCH HANDLER', msg.data);
         console.log('Search requested:', msg.data);
-        // TODO: Implement search
+        // Determine scope
+        const scope: SearchScope = msg.data?.scope || 'selection';
+        let nodes: readonly SceneNode[] = [];
+        function isSceneNode(node: BaseNode): node is SceneNode {
+          return node.type !== 'PAGE';
+        }
+        if (scope === 'selection') {
+          nodes = figma.currentPage.selection;
+        } else if (scope === 'page') {
+          nodes = figma.currentPage.findAll(isSceneNode) as SceneNode[];
+        } else if (scope === 'file') {
+          nodes = figma.root.findAll(isSceneNode) as SceneNode[];
+        }
+        // Get deprecated components from registry
+        const deprecatedComponents = Object.values(registryData.components).filter(c => c.deprecated);
+        // Map component key to registry entry
+        const deprecatedKeyMap = new Map(deprecatedComponents.map(c => [c.key, c]));
+        // Find all instances of deprecated components
+        const results: DeprecatedComponent[] = [];
+        for (const component of deprecatedComponents) {
+          const instances: ComponentInstance[] = [];
+          for (const node of nodes) {
+            if (node.type === 'INSTANCE' && node.mainComponent?.key === component.key) {
+              instances.push({
+                nodeId: node.id,
+                pageName: node.parent && 'name' in node.parent ? (node.parent as PageNode).name : figma.currentPage.name,
+              });
+            }
+          }
+          if (instances.length > 0) {
+            results.push({
+              key: component.key,
+              name: component.name,
+              deprecatedDate: component.lastModified,
+              instanceCount: instances.length,
+              instances,
+            });
+          }
+        }
         figma.ui.postMessage({
           type: MESSAGE_TYPES.SEARCH_COMPLETE,
-          data: { components: [] }
+          data: { components: results },
         });
         break;
 

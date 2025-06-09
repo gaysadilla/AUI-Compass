@@ -1,0 +1,546 @@
+{
+  "key": "12318:7152",
+  "name": "🟢 Action",
+  "type": "COMPONENT_SET",
+  "properties": {
+    "Variants": {
+      "type": "VARIANT",
+      "values": [
+        "Text and Icons",
+        "Icon Only"
+      ],
+      "defaultValue": "Text and Icons"
+    },
+    "Variants=Text and Icons..Action.Style": {
+      "value": "Filled",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Text and Icons..Action.State": {
+      "value": "Enabled",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Text and Icons..Action.Size": {
+      "value": "Medium (Default)",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Text and Icons..Action.Content.Label": {
+      "value": "Action",
+      "type": "TEXT"
+    },
+    "Variants=Text and Icons..Action.Content.Show 'Left icon'": {
+      "value": false,
+      "type": "BOOLEAN"
+    },
+    "Variants=Text and Icons..Action.Content.Select 'Right' Icon": {
+      "value": "13343:264995",
+      "type": "INSTANCE_SWAP",
+      "preferredValues": [
+        {
+          "type": "COMPONENT",
+          "key": "4d726fcc168e31d173f9fda490311a795f6a1c04"
+        }
+      ]
+    },
+    "Variants=Text and Icons..Action.Content.Show 'Right icon'": {
+      "value": false,
+      "type": "BOOLEAN"
+    },
+    "Variants=Text and Icons..Action.Content.Select 'Left' Icon": {
+      "value": "13343:264995",
+      "type": "INSTANCE_SWAP",
+      "preferredValues": [
+        {
+          "type": "COMPONENT",
+          "key": "4d726fcc168e31d173f9fda490311a795f6a1c04"
+        }
+      ]
+    },
+    "Variants=Text and Icons..Action.Content.Loader.Timeline": {
+      "value": "Start/End",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Icon Only..icon-action.Style": {
+      "value": "Filled",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Icon Only..icon-action.State": {
+      "value": "Enabled",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Icon Only..icon-action.Size": {
+      "value": "Medium (Default)",
+      "type": "VARIANT",
+      "boundVariables": {}
+    },
+    "Variants=Icon Only..icon-action.Content.Select Icon": {
+      "value": "13343:264995",
+      "type": "INSTANCE_SWAP",
+      "preferredValues": [
+        {
+          "type": "COMPONENT",
+          "key": "4d726fcc168e31d173f9fda490311a795f6a1c04"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "e17c21c409b63b6921ebb2089905f642edd1d31f"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "4caada57205d2b8f1e1d30f0da63c701a73a40d7"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "729f5b53593e10c68cfe55eeffc24154733a145a"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "4f039aacddf4b836b7dfeb74c054290187234cff"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "928e2032582b4b365d604ad15dc5f6c44fa2f34a"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "c6f906fe04e10072b5e3fc81153227ac71fbc210"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "75bce3e057630bd6b04a3a2d0373ddba35d4a290"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "852b27b173ff60ea56afa995cf5c02fdcdc1a935"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "023c38509b1028882c92309e30ee9a14b53844f5"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "983d552c5702b5060febba6d5c51dba703d12459"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "b3f5ded45f6fb60000625388a2404faa97001d41"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "b9944d09c4e891474fd13ec0139dfeeffe9a3faa"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "1e655509a3729319587c0eb0a75307fe3aecbbed"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "bf824c647292f5a8b360b52a9126cf5c82838aff"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "19d35dadba37e11e4f19da8e903d429074a588f5"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "bcfac73ef15dbd0f1f3f8ac22d0e97c22c34b78e"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "42bda35dc2c05053d15ff892e70b9b58ab0ec65d"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "de630ac3cde54c0d8c61f694cb46c602408d3769"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "f41d2f3615b353ebb1f294d92c3ffa90cc8f171f"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "9ecfaf5b3f4d171091365a2782acc44d7ef944ae"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "a693dafe5af83c2e0a7174b88bf7c4f284aae018"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "7f169b05d25a970423826eb538d7adf630630821"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "78ccc53078102b15364699ab84ac473f8cf335b2"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "1b9758d13f35a63c88b9698fbdb98bd53f51cfd8"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "9da5b585dcd9c2fbf791b264eb52b65524c43332"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "93b65f47a86b311bac0003d1e47fde48c8370d33"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "abf5541ca090a182e2cead6f768cf7b18e2223b7"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "cfcb03c1da68ba8c4f7648a23f63bd0b66d88e4f"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "1be9309762bbf90895ec48ee9ae98bebf407e364"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "bfc7ad9f327d50f96bee819b8b7671cd375fcc70"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "609249758e011d405ca2e6f01a284e2dc46ba0be"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "5fae1c3f2ed7725fd4788b318611cccc34b87a4e"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "3444ae35783610b6c8c930f7de56b22fb37ce91d"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "ace7a7f95935a7962f5c25896a66443b4e4e700e"
+        },
+        {
+          "type": "COMPONENT",
+          "key": "90ae1593e41d6f0f7c901c0946763d19ba187373"
+        }
+      ]
+    },
+    "Variants=Icon Only..icon-action.Content.Loader.Timeline": {
+      "value": "Start/End",
+      "type": "VARIANT",
+      "boundVariables": {}
+    }
+  },
+  "variants": [
+    {
+      "name": "Variants=Text and Icons",
+      "properties": {
+        "Variants": "Text and Icons"
+      }
+    },
+    {
+      "name": "Variants=Icon Only",
+      "properties": {
+        "Variants": "Icon Only"
+      }
+    }
+  ],
+  "nestedComponents": [
+    {
+      "key": "12254:267176",
+      "name": ".Action",
+      "type": "INSTANCE",
+      "properties": {
+        "Style": {
+          "value": "Filled",
+          "type": "VARIANT",
+          "boundVariables": {}
+        },
+        "State": {
+          "value": "Enabled",
+          "type": "VARIANT",
+          "boundVariables": {}
+        },
+        "Size": {
+          "value": "Medium (Default)",
+          "type": "VARIANT",
+          "boundVariables": {}
+        }
+      }
+    },
+    {
+      "key": "12249:2870",
+      "name": "Content",
+      "type": "INSTANCE",
+      "properties": {
+        "Label#12254:9": {
+          "value": "Action",
+          "type": "TEXT"
+        },
+        "Show 'Left icon'#12254:10": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "Select 'Right' Icon#12538:5": {
+          "value": "13343:264995",
+          "type": "INSTANCE_SWAP",
+          "preferredValues": [
+            {
+              "type": "COMPONENT",
+              "key": "4d726fcc168e31d173f9fda490311a795f6a1c04"
+            }
+          ]
+        },
+        "Show 'Right icon'#12254:11": {
+          "value": false,
+          "type": "BOOLEAN"
+        },
+        "Select 'Left' Icon#12538:1": {
+          "value": "13343:264995",
+          "type": "INSTANCE_SWAP",
+          "preferredValues": [
+            {
+              "type": "COMPONENT",
+              "key": "4d726fcc168e31d173f9fda490311a795f6a1c04"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "13343:264995",
+      "name": "Left Icon",
+      "type": "INSTANCE",
+      "properties": {}
+    },
+    {
+      "key": "13671:226137",
+      "name": ".Underline/End",
+      "type": "INSTANCE",
+      "properties": {}
+    },
+    {
+      "key": "13343:264995",
+      "name": "Right Icon",
+      "type": "INSTANCE",
+      "properties": {}
+    },
+    {
+      "key": "11723:74382",
+      "name": "Loader",
+      "type": "INSTANCE",
+      "properties": {
+        "Timeline": {
+          "value": "Start/End",
+          "type": "VARIANT",
+          "boundVariables": {}
+        }
+      }
+    },
+    {
+      "key": "12307:2686",
+      "name": ".icon-action",
+      "type": "INSTANCE",
+      "properties": {
+        "Style": {
+          "value": "Filled",
+          "type": "VARIANT",
+          "boundVariables": {}
+        },
+        "State": {
+          "value": "Enabled",
+          "type": "VARIANT",
+          "boundVariables": {}
+        },
+        "Size": {
+          "value": "Medium (Default)",
+          "type": "VARIANT",
+          "boundVariables": {}
+        }
+      }
+    },
+    {
+      "key": "12307:2663",
+      "name": "Content",
+      "type": "INSTANCE",
+      "properties": {
+        "Select Icon#12307:3": {
+          "value": "13343:264995",
+          "type": "INSTANCE_SWAP",
+          "preferredValues": [
+            {
+              "type": "COMPONENT",
+              "key": "4d726fcc168e31d173f9fda490311a795f6a1c04"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "e17c21c409b63b6921ebb2089905f642edd1d31f"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "4caada57205d2b8f1e1d30f0da63c701a73a40d7"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "729f5b53593e10c68cfe55eeffc24154733a145a"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "4f039aacddf4b836b7dfeb74c054290187234cff"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "928e2032582b4b365d604ad15dc5f6c44fa2f34a"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "c6f906fe04e10072b5e3fc81153227ac71fbc210"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "75bce3e057630bd6b04a3a2d0373ddba35d4a290"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "852b27b173ff60ea56afa995cf5c02fdcdc1a935"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "023c38509b1028882c92309e30ee9a14b53844f5"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "983d552c5702b5060febba6d5c51dba703d12459"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "b3f5ded45f6fb60000625388a2404faa97001d41"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "b9944d09c4e891474fd13ec0139dfeeffe9a3faa"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "1e655509a3729319587c0eb0a75307fe3aecbbed"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "bf824c647292f5a8b360b52a9126cf5c82838aff"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "19d35dadba37e11e4f19da8e903d429074a588f5"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "bcfac73ef15dbd0f1f3f8ac22d0e97c22c34b78e"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "42bda35dc2c05053d15ff892e70b9b58ab0ec65d"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "de630ac3cde54c0d8c61f694cb46c602408d3769"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "f41d2f3615b353ebb1f294d92c3ffa90cc8f171f"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "9ecfaf5b3f4d171091365a2782acc44d7ef944ae"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "a693dafe5af83c2e0a7174b88bf7c4f284aae018"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "7f169b05d25a970423826eb538d7adf630630821"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "78ccc53078102b15364699ab84ac473f8cf335b2"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "1b9758d13f35a63c88b9698fbdb98bd53f51cfd8"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "9da5b585dcd9c2fbf791b264eb52b65524c43332"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "93b65f47a86b311bac0003d1e47fde48c8370d33"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "abf5541ca090a182e2cead6f768cf7b18e2223b7"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "cfcb03c1da68ba8c4f7648a23f63bd0b66d88e4f"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "1be9309762bbf90895ec48ee9ae98bebf407e364"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "bfc7ad9f327d50f96bee819b8b7671cd375fcc70"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "609249758e011d405ca2e6f01a284e2dc46ba0be"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "5fae1c3f2ed7725fd4788b318611cccc34b87a4e"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "3444ae35783610b6c8c930f7de56b22fb37ce91d"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "ace7a7f95935a7962f5c25896a66443b4e4e700e"
+            },
+            {
+              "type": "COMPONENT",
+              "key": "90ae1593e41d6f0f7c901c0946763d19ba187373"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "13343:264995",
+      "name": "Icon",
+      "type": "INSTANCE",
+      "properties": {}
+    },
+    {
+      "key": "11723:74382",
+      "name": "Loader",
+      "type": "INSTANCE",
+      "properties": {
+        "Timeline": {
+          "value": "Start/End",
+          "type": "VARIANT",
+          "boundVariables": {}
+        }
+      }
+    }
+  ],
+  "structure": {
+    "hasNestedComponents": true,
+    "usesAutoLayout": false,
+    "childrenCount": 2
+  }
+}

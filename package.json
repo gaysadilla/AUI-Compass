@@ -13,7 +13,8 @@
     "update-registry": "ts-node src/scripts/updateRegistry.ts",
     "map-components": "ts-node src/scripts/mapComponents.ts",
     "validate-mappings": "ts-node src/scripts/validateMappings.ts",
-    "generate-registry": "ts-node src/scripts/generateRegistry.ts"
+    "generate-registry": "ts-node src/scripts/generateRegistry.ts",
+    "analyze-components": "ts-node tools/component-discovery/index.ts"
   },
   "author": "",
   "license": "ISC",
