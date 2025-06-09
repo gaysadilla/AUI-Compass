@@ -1,5 +1,15 @@
 # AUI Compass - Component Migration Plugin
 
+## Recently Added
+
+- **feat: implement scanning logic for deprecated components and display grouped results**
+  - Added backend logic to scan Figma document for deprecated component instances based on user-selected scope (selection, page, or file)
+  - Integrated registry system to identify deprecated components and retrieve metadata (name, deprecation date, etc.)
+  - Grouped found instances by component key and aggregated counts for results display
+  - Wired backend results to UI, replacing mock data with real grouped cards for each deprecated component found
+  - Updated results page to show component name, instance count, and deprecation date per card
+  - Improved code structure for maintainability and future batch migration/undo features
+
 ## Current Status
 
 **Last Updated**: June 6, 2025
@@ -26,17 +36,13 @@ Internal Figma plugin for migrating deprecated AUI design system components to n
 - [x]  Component registry service implementation
 - [x]  Registry data structure and types
 - [x]  **Button-to-Action Mapping Config implemented in TypeScript**
+- [x]  **Scanning logic for deprecated components and grouped results display**
+- [x]  **UI wired to backend for real-time results**
 
 ### 🚧 In Progress
 
-- [ ]  Registry service integration with component detection
-- [ ]  UI to display found components
 - [ ]  Component mapping validation system
-
-### 📋 TODO
-
 - [ ]  Migration preview functionality
-- [ ]  Property mapping system
 - [ ]  Migration execution
 - [ ]  Undo functionality
 - [ ]  Bulk operations
@@ -67,12 +73,14 @@ REST API (scripts) → Component Registry → Plugin → UI
 3. **Plugin Core** (`src/code.ts`)
     - Runs in Figma environment
     - Handles UI communication
-    - Will implement component search
+    - Implements component search and grouping logic
+    - Aggregates found deprecated component instances by key for results display
 
 4. **UI Layer** (`src/ui.tsx` + components)
     - React-based interface
-    - Currently shows initialization state
-    - Ready for component list implementation
+    - Displays real-time results from backend (no longer static mock data)
+    - Results page shows grouped cards for each deprecated component, with name, instance count, and deprecation date
+    - Ready for future migration/undo features
 
 ## Critical Context for Cursor/LLMs
 
