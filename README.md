@@ -2,19 +2,19 @@
 
 ## Recently Added
 
-- **feat: implement scanning logic for deprecated components and display grouped results**
-  - Added backend logic to scan Figma document for deprecated component instances based on user-selected scope (selection, page, or file)
-  - Integrated registry system to identify deprecated components and retrieve metadata (name, deprecation date, etc.)
-  - Grouped found instances by component key and aggregated counts for results display
-  - Wired backend results to UI, replacing mock data with real grouped cards for each deprecated component found
-  - Updated results page to show component name, instance count, and deprecation date per card
-  - Improved code structure for maintainability and future batch migration/undo features
+- **feat: implement component migration functionality**
+  - Added backend logic to migrate deprecated components to their new versions
+  - Implemented component swapping with proper error handling
+  - Added success/failure messaging system for UI feedback
+  - Integrated with registry system for component mapping
+  - Added progress tracking for batch migrations
+  - Improved error handling and user feedback
 
 ## Current Status
 
-**Last Updated**: June 6, 2025
-**Current Phase**: Component Registry Implementation
-**Next Task**: Integrate registry service with component detection
+**Last Updated**: March 19, 2024
+**Current Phase**: Component Migration Implementation
+**Next Task**: Add undo functionality and bulk operations
 
 ## Project Overview
 
@@ -38,12 +38,14 @@ Internal Figma plugin for migrating deprecated AUI design system components to n
 - [x]  **Button-to-Action Mapping Config implemented in TypeScript**
 - [x]  **Scanning logic for deprecated components and grouped results display**
 - [x]  **UI wired to backend for real-time results**
+- [x]  **Component migration functionality**
+- [x]  **Success/failure messaging system**
+- [x]  **Progress tracking for migrations**
 
 ### 🚧 In Progress
 
 - [ ]  Component mapping validation system
 - [ ]  Migration preview functionality
-- [ ]  Migration execution
 - [ ]  Undo functionality
 - [ ]  Bulk operations
 
@@ -113,10 +115,12 @@ export const FIGMA_PAT = process.env.FIGMA_PAT || '';
 READY = 'ready'
 SEARCH = 'search'
 CANCEL = 'cancel'
+MIGRATE = 'migrate'
 
 // From Plugin to UI
 INIT = 'init'
 SEARCH_COMPLETE = 'search-complete'
+MIGRATION_COMPLETE = 'migration-complete'
 ERROR = 'error'
 ```
 
@@ -209,6 +213,27 @@ try {
     }
   });
 }
+```
+
+### Migration Pattern
+
+```typescript
+// UI to Plugin (in React component)
+parent.postMessage({
+  pluginMessage: {
+    type: MESSAGE_TYPES.MIGRATE,
+    data: { instanceId: '...' }
+  }
+}, '*');
+
+// Plugin to UI (in code.ts)
+figma.ui.postMessage({
+  type: MESSAGE_TYPES.MIGRATION_COMPLETE,
+  data: {
+    success: true/false,
+    message: '...'
+  }
+});
 ```
 
 ## Development Commands
