@@ -758,12 +758,12 @@ figma.ui.onmessage = async (msg: UIMessage) => {
             console.warn('Mapping warnings:', mappingResult.warnings);
           }
 
-          // Get the target component key from the registry
-          const targetComponentKey = registryData.components['action'].key;
-          console.log('Target component key:', targetComponentKey);
+          // Get the target component key (either from message data or registry fallback)
+          const finalTargetComponentKey = targetComponentKey || registryData.components['action'].key;
+          console.log('Target component key:', finalTargetComponentKey);
 
           // Import the component set
-          const importedComponent = await figma.importComponentSetByKeyAsync(targetComponentKey);
+          const importedComponent = await figma.importComponentSetByKeyAsync(finalTargetComponentKey);
           if (!importedComponent) {
             throw new Error('Failed to import target component set from library');
           }
