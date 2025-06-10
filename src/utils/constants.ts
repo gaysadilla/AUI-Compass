@@ -2,8 +2,8 @@ export const PLUGIN_NAME = 'AUI Compass';
 export const PLUGIN_VERSION = '1.0.0';
 
 // Figma UI dimensions
-export const UI_WIDTH = 400;
-export const UI_HEIGHT = 600;
+export const UI_WIDTH = 620;
+export const UI_HEIGHT = 724;
 
 // Message types for type safety
 export const MESSAGE_TYPES = {

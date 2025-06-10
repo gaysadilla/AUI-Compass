@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HTMLInlineScriptPlugin = require('html-inline-script-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
 
@@ -42,6 +43,13 @@ module.exports = (env, argv) => ({
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(svg|png|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/[name][ext]'
+        }
+      },
     ],
   },
 
@@ -63,6 +71,14 @@ module.exports = (env, argv) => ({
       inject: 'body'
     }),
     new HTMLInlineScriptPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'assets',
+          to: 'assets'
+        }
+      ]
+    }),
     new webpack.DefinePlugin({
       'process.env.FIGMA_PAT': JSON.stringify(envVars.FIGMA_PAT)
     })
