@@ -22,7 +22,16 @@ const App: React.FC = () => {
     total: number;
     completed: number;
     failed: number;
-  }>({ total: 0, completed: 0, failed: 0 });
+    batchSize: number;
+    currentBatch: number;
+    performanceMetrics: {
+      startTime?: number;
+      endTime?: number;
+      averageTimePerInstance?: number;
+      fastestInstance?: number;
+      slowestInstance?: number;
+    };
+  }>({ total: 0, completed: 0, failed: 0, batchSize: 25, currentBatch: 0, performanceMetrics: {} });
 
   // Navigation handlers
   const goToDeprecationAssistant = () => setScreen(Screen.DeprecationSearchMode);
@@ -35,7 +44,7 @@ const App: React.FC = () => {
   const goToLanding = () => setScreen(Screen.Landing);
   const goToMigration = (component: DeprecatedComponent) => {
     setSelectedComponent(component);
-    setMigrationProgress({ total: component.instances.length, completed: 0, failed: 0 });
+    setMigrationProgress({ total: component.instances.length, completed: 0, failed: 0, batchSize: 25, currentBatch: 0, performanceMetrics: {} });
     setScreen(Screen.Migration);
   };
 
@@ -270,6 +279,34 @@ const App: React.FC = () => {
             </div>
           </div>
 
+          {/* Performance Settings */}
+          <div style={{ 
+            border: '1px solid #e5e5e5', 
+            borderRadius: 8, 
+            padding: 16,
+            marginBottom: 24,
+            background: '#f7f7f8'
+          }}>
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>Performance Settings</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <label style={{ fontSize: 13, color: '#666', minWidth: 80 }}>Batch Size:</label>
+              <select 
+                value={migrationProgress.batchSize}
+                onChange={(e) => setMigrationProgress(prev => ({ ...prev, batchSize: parseInt(e.target.value) }))}
+                style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc', fontSize: 13 }}
+              >
+                <option value={10}>10 (Conservative)</option>
+                <option value={25}>25 (Recommended)</option>
+                <option value={50}>50 (Aggressive)</option>
+                <option value={100}>100 (High Memory)</option>
+              </select>
+            </div>
+            <div style={{ fontSize: 12, color: '#888' }}>
+              Lower batch sizes use less memory but may be slower. Higher batch sizes are faster but use more memory.
+              <br />Recommended: 25 instances per batch for optimal balance.
+            </div>
+          </div>
+
           {/* Migration Details */}
           <div style={{ 
             border: '1px solid #e5e5e5', 
@@ -288,7 +325,7 @@ const App: React.FC = () => {
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: 12 }}>
             <button
-              onClick={() => {
+              onClick={async () => {
                 // Get the target component key from the registry
                 const mapping = registryData.mappings.find(m => m.sourceComponent.key === selectedComponent.key);
                 if (!mapping?.targetComponent) {
@@ -296,18 +333,129 @@ const App: React.FC = () => {
                   return;
                 }
 
-                // For each instance, send a migration request
-                selectedComponent.instances.forEach(instance => {
-                  parent.postMessage({ 
-                    pluginMessage: { 
-                      type: 'migrate', 
-                      data: { 
-                        instanceId: instance.nodeId,
-                        targetComponentKey: mapping.targetComponent.key
-                      } 
-                    } 
-                  }, '*');
-                });
+                // Performance tracking
+                const performanceTracker = {
+                  startTime: performance.now(),
+                  completedTimes: [] as number[],
+                  totalInstances: selectedComponent.instances.length,
+                  batchSize: migrationProgress.batchSize
+                };
+
+                console.log(`🚀 PERFORMANCE TEST: Starting migration of ${performanceTracker.totalInstances} instances`);
+                console.log(`📦 Using batch size: ${performanceTracker.batchSize} instances per batch`);
+                console.log(`🧮 Total batches: ${Math.ceil(performanceTracker.totalInstances / performanceTracker.batchSize)}`);
+
+                // Process in batches to manage memory
+                const batches = [];
+                for (let i = 0; i < selectedComponent.instances.length; i += performanceTracker.batchSize) {
+                  batches.push(selectedComponent.instances.slice(i, i + performanceTracker.batchSize));
+                }
+
+                let totalCompleted = 0;
+                let totalFailed = 0;
+
+                for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+                  const batch = batches[batchIndex];
+                  const batchStartTime = performance.now();
+                  
+                  console.log(`📦 Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} instances)`);
+
+                  // Process batch in parallel
+                  const migrationPromises = batch.map((instance, instanceIndex) => {
+                    return new Promise((resolve) => {
+                      const instanceStartTime = performance.now();
+                      
+                      const messageHandler = (event: MessageEvent) => {
+                        const msg = event.data.pluginMessage;
+                        if (msg && msg.type === 'migration-complete') {
+                          window.removeEventListener('message', messageHandler);
+                          const instanceEndTime = performance.now();
+                          const instanceDuration = instanceEndTime - instanceStartTime;
+                          performanceTracker.completedTimes.push(instanceDuration);
+                          resolve({ 
+                            success: msg.data.success, 
+                            duration: instanceDuration,
+                            batchIndex,
+                            instanceIndex 
+                          });
+                        }
+                      };
+                      
+                      window.addEventListener('message', messageHandler);
+                      
+                      // Send migration request
+                      parent.postMessage({ 
+                        pluginMessage: { 
+                          type: 'migrate', 
+                          data: { 
+                            instanceId: instance.nodeId,
+                            targetComponentKey: mapping.targetComponent.key
+                          } 
+                        } 
+                      }, '*');
+                    });
+                  });
+
+                  // Wait for batch to complete
+                  const batchResults = await Promise.allSettled(migrationPromises);
+                  const batchEndTime = performance.now();
+                  const batchDuration = batchEndTime - batchStartTime;
+
+                  // Count successes and failures for this batch
+                  const batchCompleted = batchResults.filter((result: any) => 
+                    result.status === 'fulfilled' && result.value.success
+                  ).length;
+                  const batchFailed = batch.length - batchCompleted;
+
+                  totalCompleted += batchCompleted;
+                  totalFailed += batchFailed;
+
+                  console.log(`✅ Batch ${batchIndex + 1} complete: ${batchCompleted} succeeded, ${batchFailed} failed in ${Math.round(batchDuration)}ms`);
+
+                  // Update progress
+                  setMigrationProgress(prev => ({
+                    ...prev,
+                    completed: totalCompleted,
+                    failed: totalFailed,
+                    currentBatch: batchIndex + 1
+                  }));
+
+                  // Small delay between batches to prevent memory issues
+                  if (batchIndex < batches.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                  }
+                }
+
+                // Final performance report
+                const totalEndTime = performance.now();
+                const totalDuration = totalEndTime - performanceTracker.startTime;
+                const avgTimePerInstance = performanceTracker.completedTimes.length > 0 
+                  ? performanceTracker.completedTimes.reduce((a, b) => a + b, 0) / performanceTracker.completedTimes.length
+                  : 0;
+                const fastestInstance = Math.min(...performanceTracker.completedTimes);
+                const slowestInstance = Math.max(...performanceTracker.completedTimes);
+
+                console.log(`\n📊 FINAL PERFORMANCE REPORT`);
+                console.log(`⏱️  Total Migration Time: ${(totalDuration / 1000).toFixed(2)} seconds`);
+                console.log(`📈 Instances Per Second: ${(performanceTracker.totalInstances / (totalDuration / 1000)).toFixed(2)}`);
+                console.log(`📋 Average Time Per Instance: ${Math.round(avgTimePerInstance)}ms`);
+                console.log(`🚀 Fastest Instance: ${Math.round(fastestInstance)}ms`);
+                console.log(`🐌 Slowest Instance: ${Math.round(slowestInstance)}ms`);
+                console.log(`✅ Success Rate: ${((totalCompleted / performanceTracker.totalInstances) * 100).toFixed(1)}%`);
+                console.log(`📦 Batch Size Used: ${performanceTracker.batchSize} instances`);
+                
+                // Performance assessment
+                if (avgTimePerInstance < 1000) {
+                  console.log(`🎯 EXCELLENT: Average sub-second per instance`);
+                } else if (avgTimePerInstance < 3000) {
+                  console.log(`🎯 GOOD: Fast migration performance`);
+                } else if (avgTimePerInstance < 10000) {
+                  console.log(`⚠️  ACCEPTABLE: Could be optimized further`);
+                } else {
+                  console.log(`❌ NEEDS OPTIMIZATION: Very slow performance`);
+                }
+                
+                console.log(`📊 END PERFORMANCE REPORT\n`);
               }}
               style={{
                 flex: 1,
@@ -321,7 +469,7 @@ const App: React.FC = () => {
                 border: 'none'
               }}
             >
-              Start Migration
+              Start Migration (Batch: {migrationProgress.batchSize})
             </button>
             <button
               onClick={goToResults}

@@ -451,6 +451,60 @@ async function setActionNestedProperties(
   }
 }
 
+// Performance monitoring utility
+interface PerformanceMetrics {
+  migrationId: string;
+  migrationStart: number;
+  componentAnalysis?: number;
+  propertyApplicationStart?: number;
+  propertyApplicationEnd?: number;
+  themeApplicationStart?: number;
+  themeApplicationEnd?: number;
+  totalMigration?: number;
+  memoryUsage: {
+    before?: number;
+    after?: number;
+  };
+  warnings: string[];
+}
+
+function logPerformanceMetrics(metrics: PerformanceMetrics) {
+  const total = metrics.totalMigration || (performance.now() - metrics.migrationStart);
+  console.log(`\n📊 PERFORMANCE REPORT - Instance: ${metrics.migrationId}`);
+  console.log(`⏱️  Total Migration Time: ${Math.round(total)}ms`);
+  
+  if (metrics.componentAnalysis) {
+    console.log(`📋 Component Analysis: ${Math.round(metrics.componentAnalysis)}ms`);
+  }
+  
+  if (metrics.propertyApplicationStart && metrics.propertyApplicationEnd) {
+    const propTime = metrics.propertyApplicationEnd - metrics.propertyApplicationStart;
+    console.log(`🔧 Property Application: ${Math.round(propTime)}ms`);
+  }
+  
+  if (metrics.themeApplicationStart && metrics.themeApplicationEnd) {
+    const themeTime = metrics.themeApplicationEnd - metrics.themeApplicationStart;
+    console.log(`🎨 Theme Application: ${Math.round(themeTime)}ms`);
+  }
+  
+  if (metrics.memoryUsage.before && metrics.memoryUsage.after) {
+    const memoryDelta = metrics.memoryUsage.after - metrics.memoryUsage.before;
+    console.log(`💾 Memory Delta: ${(memoryDelta / 1024 / 1024).toFixed(2)}MB`);
+  }
+  
+  if (metrics.warnings.length > 0) {
+    console.log(`⚠️  Warnings: ${metrics.warnings.length}`);
+  }
+  
+  // Performance benchmarks
+  if (total < 1000) console.log(`✅ EXCELLENT: Sub-second migration`);
+  else if (total < 3000) console.log(`✅ GOOD: Fast migration`);
+  else if (total < 10000) console.log(`⚠️  SLOW: Migration took ${(total/1000).toFixed(1)}s`);
+  else console.log(`❌ VERY SLOW: Migration took ${(total/1000).toFixed(1)}s - investigate bottlenecks`);
+  
+  console.log(`📊 END PERFORMANCE REPORT\n`);
+}
+
 // Handle messages from the UI
 figma.ui.onmessage = async (msg: UIMessage) => {
   console.log('Received message from UI:', msg);
@@ -600,81 +654,28 @@ figma.ui.onmessage = async (msg: UIMessage) => {
         break;
 
       case MESSAGE_TYPES.MIGRATE:
+        console.log('🚀 PERFORMANCE: Migration started for instance:', msg.data.instanceId);
+        const migrationStartTime = performance.now();
+        
         try {
-          const { instanceId } = msg.data;
+          const { instanceId, targetComponentKey } = msg.data;
           console.log('Starting migration for instance:', instanceId);
           
-          // === DIAGNOSTIC: LOG ALL VARIABLE COLLECTIONS ===
-          try {
-            console.log('🔍 DIAGNOSTIC: Analyzing all variable collections...');
-            const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
-            
-            // Also get remote collections from team libraries for complete analysis
-            const remoteCollections = [];
-            try {
-              const libraryCollections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
-              
-              for (const libraryCollection of libraryCollections) {
-                try {
-                  const variables = await figma.teamLibrary.getVariablesInLibraryCollectionAsync(libraryCollection.key);
-                  
-                  if (variables.length > 0) {
-                    const importedVariable = await figma.variables.importVariableByKeyAsync(variables[0].key);
-                    const collectionId = importedVariable.variableCollectionId;
-                    const variableCollection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
-                    if (variableCollection) {
-                      remoteCollections.push(variableCollection);
-                    }
-                  }
-                } catch (err) {
-                  console.error(`Failed to process library collection: ${libraryCollection.name}`, err);
-                }
-              }
-            } catch (err) {
-              console.log('No library collections available:', err);
-            }
-            
-            const allCollections = [...localCollections, ...remoteCollections];
-            console.log(`Found ${allCollections.length} total variable collections (${localCollections.length} local, ${remoteCollections.length} remote):`);
-            
-            for (let i = 0; i < allCollections.length; i++) {
-              const collection = allCollections[i];
-              console.log(`\n📁 Collection ${i + 1}: "${collection.name}" (ID: ${collection.id})`);
-              console.log(`   📋 Modes (${collection.modes.length}):`);
-              collection.modes.forEach((mode, idx) => {
-                console.log(`     ${idx + 1}. "${mode.name}" (ID: ${mode.modeId})`);
-              });
-              
-              // Log variables in this collection
-              const collectionVariables = await figma.variables.getLocalVariablesAsync();
-              const collectionVars = collectionVariables.filter(v => v.variableCollectionId === collection.id);
-              console.log(`   🎨 Variables in collection: ${collectionVars.length}`);
-              collectionVars.slice(0, 5).forEach(variable => {
-                console.log(`     - "${variable.name}" (${variable.resolvedType})`);
-              });
-              if (collectionVars.length > 5) {
-                console.log(`     ... and ${collectionVars.length - 5} more`);
-              }
-            }
-            console.log('\n🔍 DIAGNOSTIC COMPLETE - Check console for collection details\n');
-          } catch (error) {
-            console.error('❌ Error in diagnostic:', error);
-          }
-          // === END DIAGNOSTIC ===
-          
-          // Get the instance node asynchronously
+          // Get the instance node
           const instance = await figma.getNodeByIdAsync(instanceId) as InstanceNode;
-          if (!instance) {
-            throw new Error(`Could not find instance with ID: ${instanceId}`);
+          if (!instance || instance.type !== 'INSTANCE') {
+            throw new Error('Invalid instance node');
           }
 
-          // Get component info to understand what we're migrating from
+          // Get component info
           const componentInfo = await getComponentSetInfoFromInstance(instance);
           if (!componentInfo) {
-            throw new Error('Could not determine component information');
+            throw new Error('Could not get component info for instance');
           }
-
-          console.log('Component info for migration:', componentInfo);
+          
+          // Performance checkpoint 1: Component analysis
+          const analysisTime = performance.now();
+          console.log(`⏱️  PERF: Component analysis took ${Math.round(analysisTime - migrationStartTime)}ms`);
 
           // CAPTURE CURRENT PROPERTIES BEFORE MIGRATION
           console.log('Capturing current Button properties...');
@@ -873,7 +874,7 @@ figma.ui.onmessage = async (msg: UIMessage) => {
                 console.error(`  ❌ Global error on attempt ${attempt}:`, globalError);
                 
                 if (attempt < maxRetries) {
-                  const delayMs = attempt * 200; // Progressive delay
+                  const delayMs = 50; // Minimal delay instead of progressive
                   console.log(`  🔄 Retrying in ${delayMs}ms...`);
                   await new Promise(resolve => setTimeout(resolve, delayMs));
                 }
@@ -1150,6 +1151,23 @@ figma.ui.onmessage = async (msg: UIMessage) => {
 
           console.log('Property mapping completed successfully');
 
+          // PERFORMANCE TRACKING SECTION
+          const performanceMetrics = {
+            migrationId: instanceId,
+            migrationStart: migrationStartTime,
+            componentAnalysis: analysisTime - migrationStartTime,
+            propertyApplicationStart: 0,
+            propertyApplicationEnd: 0,
+            themeApplicationStart: 0,
+            themeApplicationEnd: 0,
+            totalMigration: 0,
+            memoryUsage: {
+              before: (performance as any).memory ? (performance as any).memory.usedJSHeapSize : 'unavailable',
+              after: 'pending'
+            },
+            warnings: allWarnings
+          };
+
           // Notify UI of success
           figma.ui.postMessage({
             type: 'MIGRATION_COMPLETE',
@@ -1159,6 +1177,9 @@ figma.ui.onmessage = async (msg: UIMessage) => {
               warnings: allWarnings
             }
           });
+
+          // Log performance metrics
+          logPerformanceMetrics(performanceMetrics);
         } catch (error) {
           console.error('Migration failed:', error);
           figma.ui.postMessage({
