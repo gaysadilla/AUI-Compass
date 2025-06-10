@@ -191,7 +191,9 @@ export function mapButtonToAction(buttonProps: ButtonProperties): ActionMappingR
     actionVariant
   });
   
-  if (hasIconInstance && (showLeftIcon || showRightIcon || actionVariant === 'Icon Only')) {
+  // FIXED: Always transfer icon instances if they exist, regardless of show state
+  // This ensures icons are available in Action even if hidden by default
+  if (hasIconInstance) {
     if (actionVariant === 'Icon Only') {
       // Icon-Only variant uses a single icon property
       iconMapping = {
@@ -203,11 +205,15 @@ export function mapButtonToAction(buttonProps: ButtonProperties): ActionMappingR
       console.log('✅ Icon-Only mapping created:', iconMapping);
     } else {
       // Text and Icons variant uses separate left/right icon properties
+      // If neither left nor right is specified but icon exists, default to left
+      const targetLeft = showLeftIcon || (!showLeftIcon && !showRightIcon) ? "Select 'Left' Icon#12538:1" : null;
+      const targetRight = showRightIcon ? "Select 'Right' Icon#12538:5" : null;
+      
       iconMapping = {
         source: buttonProps['Icon Instance'],
         targetIconOnly: null,
-        targetLeft: showLeftIcon ? "Select 'Left' Icon#12538:1" : null,
-        targetRight: showRightIcon ? "Select 'Right' Icon#12538:5" : null
+        targetLeft: targetLeft,
+        targetRight: targetRight
       };
       console.log('✅ Text and Icons mapping created:', iconMapping);
     }
