@@ -394,8 +394,8 @@ const App: React.FC = () => {
                 justifyContent: 'center',
                 overflow: 'hidden'
               }}>
-                <img 
-                  src="./assets/logo.png" 
+                                <img 
+                  src="https://raw.githubusercontent.com/gaysadilla/AUI-Compass/main/assets/logo.png" 
                   alt="AUI Compass Logo"
                   style={{
                     width: '100%',
@@ -403,24 +403,26 @@ const App: React.FC = () => {
                     objectFit: 'cover'
                   }}
                   onError={(e) => {
-                    console.log('PNG failed to load, trying alternative paths...');
+                    console.log('GitHub PNG failed to load, trying alternative paths...');
                     
-                                         // Try different paths
-                     const altPaths = [
-                       './assets/image%201.png',
-                       './assets/image 1.png',
-                       'assets/logo.png',
-                       'assets/image 1.png',
-                       'assets/image%201.png'
-                     ];
+                    // Try alternative GitHub paths and local fallbacks
+                    const altPaths = [
+                      'https://raw.githubusercontent.com/gaysadilla/AUI-Compass/main/assets/image%201.png',
+                      './assets/logo.png',
+                      './assets/image%201.png',
+                      './assets/image 1.png',
+                      'assets/logo.png'
+                    ];
                     
                     let pathIndex = 0;
                     const tryNextPath = () => {
                       if (pathIndex < altPaths.length) {
+                        console.log(`Trying path ${pathIndex + 1}: ${altPaths[pathIndex]}`);
                         e.currentTarget.src = altPaths[pathIndex];
                         pathIndex++;
                       } else {
                         // All paths failed, use fallback
+                        console.log('All image paths failed, using gradient fallback');
                         e.currentTarget.style.display = 'none';
                         e.currentTarget.parentElement!.style.background = 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)';
                         e.currentTarget.parentElement!.innerHTML = '<span style="color: white; font-size: 48px; font-weight: bold; transform: rotate(45deg);">↗</span>';
