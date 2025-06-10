@@ -21,4 +21,6 @@ export const MESSAGE_TYPES = {
   UNDO: 'undo',
   PREVIEW: 'preview',
   CANCEL: 'cancel',
+  GET_COMPONENT_KEYS: 'GET_COMPONENT_KEYS',
+  ANALYZE_COMPONENTS: 'ANALYZE_COMPONENTS',
 } as const; 

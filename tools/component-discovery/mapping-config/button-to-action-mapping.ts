@@ -1,13 +1,25 @@
 // Button to Action Complete Mapping Configuration
 
 export interface ButtonProperties {
-  Variant: 'Filled' | 'Outlined' | 'Flat';
+  Variant: 'Filled' | 'Outlined' | 'Flat' | '● Filled' | '○ Outlined';
   Size: 'Small' | 'Medium (Default)' | 'Large';
   State: 'Default' | 'Hover' | 'Pressed' | 'Disabled';
-  Icon: 'None' | 'Left' | 'Right' | 'Icon only';
-  Color: 'Asurion Purple' | 'Black' | 'White';
+  Icon: 'None' | 'Left' | 'Right' | 'Icon only' | 'Left ❖' | 'Right ❖' | '❖ Left' | 'Icon ❖ only';
+  Color: 'Asurion Purple' | 'Black' | 'White' | '🟣 Asurion Purple' | '⚫️ Black' | '⚪️ White';
   Label: string;
   'Icon Instance': any; // Component instance
+}
+
+export interface ActionMappingResult {
+  actionProps: any;
+  warnings: string[];
+  iconMapping: {
+    source: any;
+    targetIconOnly?: string | null;
+    targetLeft: string | null;
+    targetRight: string | null;
+  } | null;
+  themeMode?: string; // Theme mode to apply based on Button color
 }
 
 export interface ActionProperties {
@@ -89,46 +101,149 @@ export const buttonToActionMapping = {
   }
 };
 
-export function mapButtonToAction(buttonProps: ButtonProperties): {
-  actionProps: ActionProperties;
-  warnings: string[];
-  iconMapping: { source: any; target: 'left' | 'right' | 'icon' } | null;
-} {
+export function mapButtonToAction(buttonProps: ButtonProperties): ActionMappingResult {
+  console.log('🗺️ Starting Button-to-Action mapping with precise property names...');
+  
   const warnings: string[] = [];
-  const variant = determineActionVariant(buttonProps);
-  const actionProps: ActionProperties = {
-    _variant: variant as ActionProperties['_variant'],
-    Style: buttonToActionMapping.propertyMappings.style(buttonProps.Variant) as ActionProperties['Style'],
-    State: buttonToActionMapping.propertyMappings.state(buttonProps.State) as ActionProperties['State'],
-    Size: buttonToActionMapping.propertyMappings.size(buttonProps.Size) as ActionProperties['Size']
+  
+  // Based on logs: Action uses "Outline" and "Filled" 
+  const variantMapping: Record<string, string> = {
+    '● Filled': 'Filled',
+    '○ Outlined': 'Outline', // Correct value found in logs!
+    'Filled': 'Filled',
+    'Outlined': 'Outline'
   };
-  if (variant === 'Icon Only') {
-    // Icon Only variant doesn't need label or show icon properties
-  } else if (variant === 'Text') {
-    actionProps.Label = buttonProps.Label;
-  } else if (variant === 'Text and Icons') {
-    const iconConfig = buttonToActionMapping.propertyMappings.iconConfig(buttonProps.Icon);
-    Object.assign(actionProps, iconConfig);
-    actionProps.Label = buttonProps.Label;
-  }
-  const colorResult = buttonToActionMapping.colorHandling(buttonProps.Color);
-  if (colorResult.warning) {
-    warnings.push(colorResult.warning);
-  }
-  let iconMapping: { source: any; target: 'left' | 'right' | 'icon' } | null = null;
-  if (buttonProps['Icon Instance']) {
-    if (buttonProps.Icon === 'Left') {
-      iconMapping = { source: buttonProps['Icon Instance'], target: 'left' };
-    } else if (buttonProps.Icon === 'Right') {
-      iconMapping = { source: buttonProps['Icon Instance'], target: 'right' };
-    } else if (buttonProps.Icon === 'Icon only') {
-      iconMapping = { source: buttonProps['Icon Instance'], target: 'icon' };
+
+  // Based on analysis: Button uses "Default", Action uses "Enabled" 
+  const stateMapping: Record<string, string> = {
+    'Default': 'Enabled',
+    'Hover': 'Hover',
+    'Active': 'Active',
+    'Disabled': 'Disabled'
+  };
+
+  // Determine Action variant based on Button icon configuration
+  let actionVariant = 'Text'; // Default
+  let showLeftIcon = false;
+  let showRightIcon = false;
+
+  if (buttonProps.Icon) {
+    switch (buttonProps.Icon) {
+      case '❖ Left': // Fix: Correct value from logs
+        actionVariant = 'Text and Icons';
+        showLeftIcon = true;
+        break;
+      case 'Right ❖':
+        actionVariant = 'Text and Icons';
+        showRightIcon = true;
+        break;
+      case 'Icon ❖ only': // Fix: Correct value from logs
+        actionVariant = 'Icon Only';
+        showLeftIcon = true; // Icon only typically uses left icon
+        break;
+      case 'None':
+      default:
+        actionVariant = 'Text';
+        break;
     }
   }
+
+  // Create the mapped Action properties using EXACT property names from analysis
+  const actionProps = {
+    // Main Action variant (what gets swapped to)
+    _variant: actionVariant,
+    
+    // Nested component 1: Style=Filled, State=Enabled, Size=Medium (Default)
+    'Style': variantMapping[buttonProps.Variant] || 'Filled',
+    'State': stateMapping[buttonProps.State] || 'Enabled', 
+    'Size': buttonProps.Size || 'Medium (Default)',
+    
+    // Nested component 2: .Action Content/Medium (default)
+    'Action Text#12254:9': buttonProps.Label || '',
+    "Show 'Left icon'#12254:10": showLeftIcon,
+    "Show 'Right icon'#12254:11": showRightIcon,
+    
+    // Icon instance mapping (if provided)
+    "Select 'Right' Icon#12538:5": showRightIcon ? buttonProps['Icon Instance'] : null,
+    "Select 'Left' Icon#12538:1": showLeftIcon ? buttonProps['Icon Instance'] : null
+  };
+
+  console.log('🎯 Mapped Action properties:', actionProps);
+
+  // Validate mappings
+  if (!variantMapping[buttonProps.Variant]) {
+    warnings.push(`Unknown Button variant: ${buttonProps.Variant}`);
+  }
+  
+  if (!stateMapping[buttonProps.State]) {
+    warnings.push(`Unknown Button state: ${buttonProps.State}`);
+  }
+
+  // Icon mapping for instance swapping
+  let iconMapping = null;
+  const hasIconInstance = buttonProps['Icon Instance'] && buttonProps['Icon Instance'] !== null && buttonProps['Icon Instance'] !== '';
+  console.log('🔍 Icon mapping check:', { 
+    hasIconInstance, 
+    iconInstance: buttonProps['Icon Instance'], 
+    showLeftIcon, 
+    showRightIcon, 
+    iconType: buttonProps.Icon,
+    actionVariant
+  });
+  
+  if (hasIconInstance && (showLeftIcon || showRightIcon || actionVariant === 'Icon Only')) {
+    if (actionVariant === 'Icon Only') {
+      // Icon-Only variant uses a single icon property
+      iconMapping = {
+        source: buttonProps['Icon Instance'],
+        targetIconOnly: "Select Icon#12307:3",
+        targetLeft: null,
+        targetRight: null
+      };
+      console.log('✅ Icon-Only mapping created:', iconMapping);
+    } else {
+      // Text and Icons variant uses separate left/right icon properties
+      iconMapping = {
+        source: buttonProps['Icon Instance'],
+        targetIconOnly: null,
+        targetLeft: showLeftIcon ? "Select 'Left' Icon#12538:1" : null,
+        targetRight: showRightIcon ? "Select 'Right' Icon#12538:5" : null
+      };
+      console.log('✅ Text and Icons mapping created:', iconMapping);
+    }
+  } else {
+    console.log('❌ Icon mapping not created - requirements not met');
+  }
+
+  // Determine theme mode based on Button color
+  let themeMode: string | undefined;
+  switch (buttonProps.Color) {
+    case '🟣 Asurion Purple':
+    case 'Asurion Purple':
+      themeMode = 'Asurion - Light';
+      console.log('🎨 Theme: Keeping Asurion branding (Light mode)');
+      break;
+    case '⚪️ White':
+    case 'White':
+      themeMode = 'Asurion - Dark';
+      console.log('🎨 Theme: Keeping Asurion branding (Dark mode)');
+      break;
+    case '⚫️ Black':
+    case 'Black':
+      themeMode = 'Partner - Light';
+      console.log('🎨 Theme: Removing branding for Partner (Light mode)');
+      break;
+    default:
+      console.log(`⚠️ Unknown Button color: ${buttonProps.Color}, keeping default theme`);
+      warnings.push(`Unknown Button color: ${buttonProps.Color}. Theme not changed.`);
+      break;
+  }
+
   return {
     actionProps,
     warnings,
-    iconMapping
+    iconMapping,
+    themeMode
   };
 }
 

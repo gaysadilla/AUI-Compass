@@ -1,0 +1,43 @@
+{
+  "lastUpdated": "2025-06-10T00:40:36.810Z",
+  "foundationsFileKey": "6U6RqnBEYnBL5oRovZY4Gt",
+  "themeCollection": {
+    "id": "VariableCollectionId:3097:1846",
+    "name": "System Tokens and Themes",
+    "modes": [
+      {
+        "modeId": "3097:2",
+        "name": "Asurion - Light"
+      },
+      {
+        "modeId": "3291:0",
+        "name": "Asurion - Dark"
+      },
+      {
+        "modeId": "3562:2",
+        "name": "Partner - Light"
+      },
+      {
+        "modeId": "3562:3",
+        "name": "Partner - Dark"
+      }
+    ]
+  },
+  "bridgeVariables": [
+    {
+      "key": "cdf6a9c02c67c0ffd0047769c6e58028aa9cef5a",
+      "name": "brand/white",
+      "id": "VariableID:3255:1314"
+    },
+    {
+      "key": "41bff8cad62230146f89641815d179956261aedb",
+      "name": "brand/black",
+      "id": "VariableID:3255:1315"
+    },
+    {
+      "key": "c4b505c545524eab2bf12c59a3d8bcb3018700ef",
+      "name": "brand/asurion-purple",
+      "id": "VariableID:3227:7895"
+    }
+  ]
+}

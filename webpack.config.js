@@ -1,6 +1,16 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HTMLInlineScriptPlugin = require('html-inline-script-webpack-plugin');
+const webpack = require('webpack');
 const path = require('path');
+
+// Load environment variables from .env file
+const dotenv = require('dotenv');
+const envVars = dotenv.config().parsed || {};
+
+console.log('🔧 Build time environment check:');
+console.log(`FIGMA_PAT found: ${envVars.FIGMA_PAT ? 'Yes' : 'No'}`);
+console.log(`FIGMA_PAT length: ${envVars.FIGMA_PAT ? envVars.FIGMA_PAT.length : '0'}`);
+console.log(`FIGMA_PAT starts with figd_: ${envVars.FIGMA_PAT ? envVars.FIGMA_PAT.startsWith('figd_') : 'No'}`);
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
@@ -52,6 +62,9 @@ module.exports = (env, argv) => ({
       chunks: ['ui'],
       inject: 'body'
     }),
-    new HTMLInlineScriptPlugin()
+    new HTMLInlineScriptPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.FIGMA_PAT': JSON.stringify(envVars.FIGMA_PAT)
+    })
   ],
 }); 

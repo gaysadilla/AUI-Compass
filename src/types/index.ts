@@ -5,7 +5,7 @@ export interface PluginMessage {
 }
 
 export interface UIMessage {
-  type: 'ready' | 'search' | 'migrate' | 'undo' | 'preview' | 'cancel';
+  type: 'ready' | 'search' | 'migrate' | 'undo' | 'preview' | 'cancel' | 'GET_COMPONENT_KEYS' | 'ANALYZE_COMPONENTS' | 'diagnose-themes';
   data?: any;
 }
 
@@ -13,6 +13,7 @@ export interface UIMessage {
 export interface DeprecatedComponent {
   key: string;
   name: string;
+  displayName?: string;
   deprecatedDate: string;
   instanceCount: number;
   instances: ComponentInstance[];
