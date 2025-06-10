@@ -4,7 +4,7 @@ export interface ButtonProperties {
   Variant: 'Filled' | 'Outlined' | 'Flat' | '● Filled' | '○ Outlined';
   Size: 'Small' | 'Medium (Default)' | 'Large';
   State: 'Default' | 'Hover' | 'Pressed' | 'Disabled';
-  Icon: 'None' | 'Left' | 'Right' | 'Icon only' | 'Left ❖' | 'Right ❖' | '❖ Left' | 'Icon ❖ only';
+  Icon: 'None' | 'Left' | 'Right' | 'Icon only' | 'Left ❖' | 'Right ❖' | '❖ Left' | '❖ Right' | 'Icon ❖ only';
   Color: 'Asurion Purple' | 'Black' | 'White' | '🟣 Asurion Purple' | '⚫️ Black' | '⚪️ White';
   Label: string;
   'Icon Instance': any; // Component instance
@@ -130,20 +130,36 @@ export function mapButtonToAction(buttonProps: ButtonProperties): ActionMappingR
   if (buttonProps.Icon) {
     switch (buttonProps.Icon) {
       case '❖ Left': // Fix: Correct value from logs
+      case 'Left ❖': // Alternative format
+      case 'Left': // Simple format
         actionVariant = 'Text and Icons';
         showLeftIcon = true;
         break;
       case 'Right ❖':
+      case '❖ Right': // Alternative format  
+      case 'Right': // Simple format
         actionVariant = 'Text and Icons';
         showRightIcon = true;
         break;
       case 'Icon ❖ only': // Fix: Correct value from logs
+      case 'Icon only': // Simple format
         actionVariant = 'Icon Only';
         showLeftIcon = true; // Icon only typically uses left icon
         break;
       case 'None':
-      default:
+        // FIXED: When Icon='None', always treat as Text variant regardless of icon instance
         actionVariant = 'Text';
+        showLeftIcon = false;
+        showRightIcon = false;
+        break;
+      default:
+        // Only apply smart defaulting for truly unknown/undefined icon types, not 'None'
+        if (buttonProps['Icon Instance'] && buttonProps['Icon Instance'] !== null) {
+          actionVariant = 'Text and Icons';
+          showLeftIcon = true; // Default to left icon when position is unclear
+        } else {
+          actionVariant = 'Text';
+        }
         break;
     }
   }
@@ -193,12 +209,28 @@ export function mapButtonToAction(buttonProps: ButtonProperties): ActionMappingR
   
   // FIXED: Always transfer icon instances if they exist, regardless of show state
   // This ensures icons are available in Action even if hidden by default
-  if (hasIconInstance) {
+  // EXCEPTION: If Button explicitly has Icon='None', respect that choice
+  if (hasIconInstance && buttonProps.Icon !== 'None') {
     if (actionVariant === 'Icon Only') {
-      // Icon-Only variant uses a single icon property
+      // Icon-Only variant uses a single icon property - different for each size
+      let iconPropertyName = "Select Icon#12307:1"; // Default to Large
+      switch (buttonProps.Size) {
+        case 'Small':
+          iconPropertyName = "Select Icon#12307:2";
+          break;
+        case 'Medium (Default)':
+          iconPropertyName = "Select Icon#12307:3";
+          break;
+        case 'Large':
+          iconPropertyName = "Select Icon#12307:1";
+          break;
+        default:
+          iconPropertyName = "Select Icon#12307:3"; // Default to Medium
+      }
+      
       iconMapping = {
         source: buttonProps['Icon Instance'],
-        targetIconOnly: "Select Icon#12307:3",
+        targetIconOnly: iconPropertyName,
         targetLeft: null,
         targetRight: null
       };
