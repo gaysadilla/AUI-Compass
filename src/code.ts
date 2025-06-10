@@ -461,7 +461,7 @@ interface PerformanceMetrics {
   themeApplicationStart?: number;
   themeApplicationEnd?: number;
   totalMigration?: number;
-  memoryUsage: {
+  memoryUsage?: {
     before?: number;
     after?: number;
   };
@@ -469,7 +469,7 @@ interface PerformanceMetrics {
 }
 
 function logPerformanceMetrics(metrics: PerformanceMetrics) {
-  const total = metrics.totalMigration || (performance.now() - metrics.migrationStart);
+  const total = metrics.totalMigration || (Date.now() - metrics.migrationStart);
   console.log(`\n📊 PERFORMANCE REPORT - Instance: ${metrics.migrationId}`);
   console.log(`⏱️  Total Migration Time: ${Math.round(total)}ms`);
   
@@ -655,7 +655,7 @@ figma.ui.onmessage = async (msg: UIMessage) => {
 
       case MESSAGE_TYPES.MIGRATE:
         console.log('🚀 PERFORMANCE: Migration started for instance:', msg.data.instanceId);
-        const migrationStartTime = performance.now();
+        const migrationStartTime = Date.now();
         
         try {
           const { instanceId, targetComponentKey } = msg.data;
@@ -674,7 +674,7 @@ figma.ui.onmessage = async (msg: UIMessage) => {
           }
           
           // Performance checkpoint 1: Component analysis
-          const analysisTime = performance.now();
+          const analysisTime = Date.now();
           console.log(`⏱️  PERF: Component analysis took ${Math.round(analysisTime - migrationStartTime)}ms`);
 
           // CAPTURE CURRENT PROPERTIES BEFORE MIGRATION
@@ -1151,22 +1151,13 @@ figma.ui.onmessage = async (msg: UIMessage) => {
 
           console.log('Property mapping completed successfully');
 
-          // PERFORMANCE TRACKING SECTION
-          const performanceMetrics = {
-            migrationId: instanceId,
-            migrationStart: migrationStartTime,
-            componentAnalysis: analysisTime - migrationStartTime,
-            propertyApplicationStart: 0,
-            propertyApplicationEnd: 0,
-            themeApplicationStart: 0,
-            themeApplicationEnd: 0,
-            totalMigration: 0,
-            memoryUsage: {
-              before: (performance as any).memory ? (performance as any).memory.usedJSHeapSize : 'unavailable',
-              after: 'pending'
-            },
-            warnings: allWarnings
-          };
+          // Simple performance logging
+          const totalMigrationTime = Date.now() - migrationStartTime;
+          console.log(`\n📊 MIGRATION COMPLETE - Instance: ${instanceId}`);
+          console.log(`⏱️  Total Migration Time: ${totalMigrationTime}ms`);
+          if (totalMigrationTime < 1000) console.log(`✅ EXCELLENT: Sub-second migration`);
+          else if (totalMigrationTime < 3000) console.log(`✅ GOOD: Fast migration`);
+          else console.log(`⚠️  SLOW: Migration took ${(totalMigrationTime/1000).toFixed(1)}s`);
 
           // Notify UI of success
           figma.ui.postMessage({
@@ -1177,9 +1168,6 @@ figma.ui.onmessage = async (msg: UIMessage) => {
               warnings: allWarnings
             }
           });
-
-          // Log performance metrics
-          logPerformanceMetrics(performanceMetrics);
         } catch (error) {
           console.error('Migration failed:', error);
           figma.ui.postMessage({
