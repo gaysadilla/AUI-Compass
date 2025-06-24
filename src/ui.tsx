@@ -4,7 +4,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './components/App';
-import './styles.css';
+import './globals.css';
 import { MESSAGE_TYPES } from './utils/constants';
 
 declare global {
